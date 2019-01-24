@@ -4,7 +4,7 @@ import { Button, Container, Row, Col, Jumbotron } from 'reactstrap';
 import { Link } from 'react-router';
 import Example from '../examples/import-basic';
 
-const importBasic = require('!!raw!../examples/import-basic');
+const importBasic = require('!!raw-loader!../examples/import-basic');
 
 export default () => {
   return (
@@ -21,8 +21,8 @@ export default () => {
                 Easy to use React Bootstrap 4 components
               </p>
               <p>
-                <Button outline color="danger" href="https://github.com/reactstrap/reactstrap">View on Github</Button>
-                <Button color="danger" tag={Link} to="/components/">View Components</Button>
+                <Button outline color="danger" href="https://github.com/reactstrap/reactstrap">GitHub</Button>
+                <Button color="danger" tag={Link} to="/components/">Components</Button>
               </p>
             </Col>
           </Row>
@@ -36,7 +36,7 @@ export default () => {
             <h3 className="mt-5">NPM</h3>
             <p>Install reactstrap and peer dependencies via NPM</p>
             <pre>
-              <PrismCode className="language-bash">npm install --save reactstrap@next react react-dom</PrismCode>
+              <PrismCode className="language-bash">npm install --save reactstrap react react-dom</PrismCode>
             </pre>
             <p>Import the components you need</p>
             <div className="docs-example">
@@ -67,7 +67,7 @@ npm start`}
             <pre>
               <PrismCode className="language-bash">
   {`npm install bootstrap --save
-npm install --save reactstrap@next react react-dom`}
+npm install --save reactstrap react react-dom`}
               </PrismCode>
             </pre>
             <p>Import Bootstrap CSS in the <code>src/index.js</code> file:</p>
@@ -80,7 +80,7 @@ npm install --save reactstrap@next react react-dom`}
                 {`import { Button } from 'reactstrap';`}
               </PrismCode>
             </pre>
-            <p>Now you are ready to use the imported reactstrap components within your component hierarchy defined in the render method. Here is an example <a href="https://gist.github.com/eddywashere/e13033c0e655ab7cda995f8bc77ce40d" target="_blank"><code>App.js</code></a> redone using reactstrap.</p>
+            <p>Now you are ready to use the imported reactstrap components within your component hierarchy defined in the render method. Here is an example <a href="https://gist.github.com/Thomas-Smyth/006fd507a7295f17a8473451938f9935" target="_blank"><code>App.js</code></a> redone using reactstrap.</p>
             <h2 className="mt-5">CDN</h2>
             <p>Reactstrap can be included directly in your application's bundle or excluded during compilation and linked directly to a CDN.</p>
             <pre>

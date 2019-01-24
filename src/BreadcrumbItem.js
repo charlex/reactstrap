@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { mapToCssModules } from './utils';
+import { mapToCssModules, tagPropType } from './utils';
 
 const propTypes = {
-  tag: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  tag: tagPropType,
   active: PropTypes.bool,
   className: PropTypes.string,
   cssModule: PropTypes.object,
@@ -29,7 +29,7 @@ const BreadcrumbItem = (props) => {
   ), cssModule);
 
   return (
-    <Tag {...attributes} className={classes} />
+    <Tag {...attributes} className={classes} aria-current={active ? 'page' : undefined} />
   );
 };
 

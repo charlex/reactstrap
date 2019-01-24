@@ -4,13 +4,13 @@ import { PrismCode } from 'react-prism';
 import PageTitle from '../UI/PageTitle';
 import SectionTitle from '../UI/SectionTitle';
 import TooltipExample from '../examples/Tooltip';
-const TooltipExampleSource = require('!!raw!../examples/Tooltip');
+const TooltipExampleSource = require('!!raw-loader!../examples/Tooltip');
 import TooltipAutoHideExample from '../examples/TooltipAutoHide';
-const TooltipExampleAutoHideSource = require('!!raw!../examples/TooltipAutoHide');
+const TooltipExampleAutoHideSource = require('!!raw-loader!../examples/TooltipAutoHide');
 import TooltipExampleMulti from '../examples/TooltipMulti';
-const TooltipExampleMultiSource = require('!!raw!../examples/TooltipMulti');
+const TooltipExampleMultiSource = require('!!raw-loader!../examples/TooltipMulti');
 import TooltipExampleUncontrolled from '../examples/TooltipUncontrolled';
-const TooltipExampleUncontrolledSource = require('!!raw!../examples/TooltipUncontrolled');
+const TooltipExampleUncontrolledSource = require('!!raw-loader!../examples/TooltipUncontrolled');
 
 export default class TooltipsPage extends React.Component {
   render() {
@@ -30,10 +30,14 @@ export default class TooltipsPage extends React.Component {
         <pre>
           <PrismCode className="language-jsx">
 {`Tooltip.propTypes = {
+  // space separated list of triggers (e.g. "click hover focus")
+  trigger: PropTypes.string,
+  // boundaries for popper, can be scrollParent, window, viewport, or any DOM element
+  boundariesElement: PropTypes.oneOfType([PropTypes.string, DOMElement]),
   // boolean to control the state of the tooltip
   isOpen: PropTypes.bool,
   hideArrow: PropTypes.bool,
-  // callback for toggling isOpen in the controlling component
+  // callback for toggling isOpen in the controlling component. It will receive an object with info about the event that triggered it
   toggle: PropTypes.func,
   // target element or element ID, popover is attached to this element
   target:  PropTypes.oneOfType([
@@ -51,6 +55,8 @@ export default class TooltipsPage extends React.Component {
   className: PropTypes.string,
   // Apply class to the inner-tooltip
   innerClassName: PropTypes.string,
+  // Apply class to the arrow-tooltip ('arrow' by default)
+  arrowClassName: PropTypes.string,
   // optionally hide tooltip when hovering over tooltip content - default true
   autohide: PropTypes.bool,
   // convenience attachments for popover
@@ -72,7 +78,17 @@ export default class TooltipsPage extends React.Component {
     'left-end',
   ]),
   // Custom modifiers that are passed to Popper.js, see https://popper.js.org/popper-documentation.html#modifiers
-  modifiers: PropTypes.object
+  modifiers: PropTypes.object,
+  offset: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]),
+  // Custom ref handler that will be assigned to the "ref" of the <div> wrapping the tooltip elements
+  innerRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string,
+    PropTypes.object
+  ])
 }`}
           </PrismCode>
         </pre>

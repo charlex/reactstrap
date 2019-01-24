@@ -1,4 +1,5 @@
 import isFunction from 'lodash.isfunction';
+import PropTypes from 'prop-types';
 
 // https://github.com/twbs/bootstrap/blob/v4.0.0-alpha.4/js/src/modal.js#L436-L443
 export function getScrollbarWidth() {
@@ -26,20 +27,18 @@ export function isBodyOverflowing() {
 export function getOriginalBodyPadding() {
   const style = window.getComputedStyle(document.body, null);
 
-  return parseInt(
-    (style && style.getPropertyValue('padding-right')) || 0,
-    10
-  );
+  return parseInt((style && style.getPropertyValue('padding-right')) || 0, 10);
 }
 
 export function conditionallyUpdateScrollbar() {
   const scrollbarWidth = getScrollbarWidth();
   // https://github.com/twbs/bootstrap/blob/v4.0.0-alpha.6/js/src/modal.js#L433
-  const fixedContent = document.querySelectorAll('.fixed-top, .fixed-bottom, .is-fixed, .sticky-top')[0];
-  const bodyPadding = fixedContent ? parseInt(
-    fixedContent.style.paddingRight || 0,
-    10
-  ) : 0;
+  const fixedContent = document.querySelectorAll(
+    '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top'
+  )[0];
+  const bodyPadding = fixedContent
+    ? parseInt(fixedContent.style.paddingRight || 0, 10)
+    : 0;
 
   if (isBodyOverflowing()) {
     setScrollbarWidth(bodyPadding + scrollbarWidth);
@@ -54,7 +53,10 @@ export function setGlobalCssModule(cssModule) {
 
 export function mapToCssModules(className = '', cssModule = globalCssModule) {
   if (!cssModule) return className;
-  return className.split(' ').map(c => cssModule[c] || c).join(' ');
+  return className
+    .split(' ')
+    .map(c => cssModule[c] || c)
+    .join(' ');
 }
 
 /**
@@ -62,7 +64,7 @@ export function mapToCssModules(className = '', cssModule = globalCssModule) {
  */
 export function omit(obj, omitKeys) {
   const result = {};
-  Object.keys(obj).forEach((key) => {
+  Object.keys(obj).forEach(key => {
     if (omitKeys.indexOf(key) === -1) {
       result[key] = obj[key];
     }
@@ -102,7 +104,9 @@ export function warnOnce(message) {
 export function deprecated(propType, explanation) {
   return function validate(props, propName, componentName, ...rest) {
     if (props[propName] !== null && typeof props[propName] !== 'undefined') {
-      warnOnce(`"${propName}" property of "${componentName}" has been deprecated.\n${explanation}`);
+      warnOnce(
+        `"${propName}" property of "${componentName}" has been deprecated.\n${explanation}`
+      );
     }
 
     return propType(props, propName, componentName, ...rest);
@@ -112,31 +116,32 @@ export function deprecated(propType, explanation) {
 export function DOMElement(props, propName, componentName) {
   if (!(props[propName] instanceof Element)) {
     return new Error(
-      'Invalid prop `' + propName + '` supplied to `' + componentName +
-      '`. Expected prop to be an instance of Element. Validation failed.'
+      'Invalid prop `' +
+        propName +
+        '` supplied to `' +
+        componentName +
+        '`. Expected prop to be an instance of Element. Validation failed.'
     );
   }
 }
 
-export function getTarget(target) {
-  if (isFunction(target)) {
-    return target();
-  }
+export const targetPropType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.func,
+  DOMElement,
+  PropTypes.shape({ current: PropTypes.any }),
+]);
 
-  if (typeof target === 'string' && document) {
-    let selection = document.querySelector(target);
-    if (selection === null) {
-      selection = document.querySelector(`#${target}`);
-    }
-    if (selection === null) {
-      throw new Error(`The target '${target}' could not be identified in the dom, tip: check spelling`);
-    }
-    return selection;
-  }
-
-  return target;
-}
-
+export const tagPropType = PropTypes.oneOfType([
+  PropTypes.func,
+  PropTypes.string,
+  PropTypes.shape({ $$typeof: PropTypes.symbol, render: PropTypes.func }),
+  PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string,
+    PropTypes.shape({ $$typeof: PropTypes.symbol, render: PropTypes.func }),
+  ]))
+]);
 
 /* eslint key-spacing: ["error", { afterColon: true, align: "value" }] */
 // These are all setup to match what is in the bootstrap _variables.scss
@@ -177,9 +182,14 @@ export const TransitionStatuses = {
 export const keyCodes = {
   esc:   27,
   space: 32,
+  enter: 13,
   tab:   9,
   up:    38,
   down:  40,
+  home:  36,
+  end:   35,
+  n:     78,
+  p:     80,
 };
 
 export const PopperPlacements = [
@@ -205,3 +215,101 @@ export const canUseDOM = !!(
   window.document &&
   window.document.createElement
 );
+
+export function isReactRefObj(target) {
+  if (target && typeof target === 'object') {
+    return 'current' in target;
+  }
+  return false;
+}
+
+export function findDOMElements(target) {
+  if (isReactRefObj(target)) {
+    return target.current;
+  }
+  if (isFunction(target)) {
+    return target();
+  }
+  if (typeof target === 'string' && canUseDOM) {
+    let selection = document.querySelectorAll(target);
+    if (!selection.length) {
+      selection = document.querySelectorAll(`#${target}`);
+    }
+    if (!selection.length) {
+      throw new Error(
+        `The target '${target}' could not be identified in the dom, tip: check spelling`
+      );
+    }
+    return selection;
+  }
+  return target;
+}
+
+export function isArrayOrNodeList(els) {
+  if (els === null) {
+    return false;
+  }
+  return Array.isArray(els) || (canUseDOM && typeof els.length === 'number');
+}
+
+export function getTarget(target) {
+  const els = findDOMElements(target);
+  if (isArrayOrNodeList(els)) {
+    return els[0];
+  }
+  return els;
+}
+
+export const defaultToggleEvents = ['touchstart', 'click'];
+
+export function addMultipleEventListeners(_els, handler, _events, useCapture) {
+  let els = _els;
+  if (!isArrayOrNodeList(els)) {
+    els = [els];
+  }
+
+  let events = _events;
+  if (typeof events === 'string') {
+    events = events.split(/\s+/);
+  }
+
+  if (
+    !isArrayOrNodeList(els) ||
+    typeof handler !== 'function' ||
+    !Array.isArray(events)
+  ) {
+    throw new Error(`
+      The first argument of this function must be DOM node or an array on DOM nodes or NodeList.
+      The second must be a function.
+      The third is a string or an array of strings that represents DOM events
+    `);
+  }
+
+  Array.prototype.forEach.call(events, event => {
+    Array.prototype.forEach.call(els, el => {
+      el.addEventListener(event, handler, useCapture);
+    });
+  });
+  return function removeEvents() {
+    Array.prototype.forEach.call(events, event => {
+      Array.prototype.forEach.call(els, el => {
+        el.removeEventListener(event, handler, useCapture);
+      });
+    });
+  };
+}
+
+export const focusableElements = [
+  'a[href]',
+  'area[href]',
+  'input:not([disabled]):not([type=hidden])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  'object',
+  'embed',
+  '[tabindex]:not(.modal)',
+  'audio[controls]',
+  'video[controls]',
+  '[contenteditable]:not([contenteditable="false"])',
+];

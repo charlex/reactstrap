@@ -9,7 +9,7 @@ describe('Input', () => {
     expect(wrapper.type()).toBe('input');
   });
 
-  it('should render with "select" tag when type is "select"', () => {
+  it('should render with "type" tag when type is "select"', () => {
     const wrapper = shallow(<Input type="select">Yo!</Input>);
 
     expect(wrapper.type()).toBe('select');
@@ -21,10 +21,10 @@ describe('Input', () => {
     expect(wrapper.type()).toBe('textarea');
   });
 
-  it('should render with "p" tag when plaintext prop is truthy', () => {
+  it('should render with "input" tag when plaintext prop is truthy', () => {
     const wrapper = shallow(<Input type="select" plaintext />);
 
-    expect(wrapper.type()).toBe('p');
+    expect(wrapper.type()).toBe('input');
   });
 
   it('should render with "form-control-plaintext" class when plaintext prop is truthy', () => {
@@ -240,5 +240,13 @@ describe('Input', () => {
     const wrapper = shallow(<Input className="other">Yo!</Input>);
 
     expect(wrapper.hasClass('other')).toBe(true);
+  });
+
+  it('should render "select" and "textarea" without type property', () => {
+    const input = shallow(<Input type="select">Yo!</Input>);
+    const textarea = shallow(<Input type="textarea">Yo!</Input>);
+
+    expect(input.find('[type="select"]').exists()).toBe(false);
+    expect(textarea.find('[type="textarea"]').exists()).toBe(false);
   });
 });

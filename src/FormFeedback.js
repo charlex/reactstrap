@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { mapToCssModules } from './utils';
+import { mapToCssModules, tagPropType } from './utils';
 
 const propTypes = {
   children: PropTypes.node,
-  tag: PropTypes.string,
+  tag: tagPropType,
   className: PropTypes.string,
   cssModule: PropTypes.object,
-  valid: PropTypes.bool
+  valid: PropTypes.bool,
+  tooltip: PropTypes.bool
 };
 
 const defaultProps = {
@@ -21,18 +22,22 @@ const FormFeedback = (props) => {
     className,
     cssModule,
     valid,
+    tooltip,
     tag: Tag,
     ...attributes
   } = props;
 
-  const classes = mapToCssModules(classNames(
-    className,
-    valid ? 'valid-feedback' : 'invalid-feedback'
-  ), cssModule);
+  const validMode = tooltip ? 'tooltip' : 'feedback';
 
-  return (
-    <Tag {...attributes} className={classes} />
+  const classes = mapToCssModules(
+    classNames(
+      className,
+      valid ? `valid-${validMode}` : `invalid-${validMode}`
+    ),
+    cssModule
   );
+
+  return <Tag {...attributes} className={classes} />;
 };
 
 FormFeedback.propTypes = propTypes;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { mapToCssModules } from './utils';
+import { mapToCssModules, tagPropType } from './utils';
 
 const propTypes = {
   'aria-label': PropTypes.string,
@@ -10,7 +10,7 @@ const propTypes = {
   cssModule: PropTypes.object,
   next: PropTypes.bool,
   previous: PropTypes.bool,
-  tag: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  tag: tagPropType,
 };
 
 const defaultProps = {
@@ -18,7 +18,7 @@ const defaultProps = {
 };
 
 const PaginationLink = (props) => {
-  const {
+  let {
     className,
     cssModule,
     next,
@@ -50,6 +50,10 @@ const PaginationLink = (props) => {
   let children = props.children;
   if (children && Array.isArray(children) && children.length === 0) {
     children = null;
+  }
+
+  if (!attributes.href && Tag === 'a') {
+    Tag = 'button';
   }
 
   if (previous || next) {
